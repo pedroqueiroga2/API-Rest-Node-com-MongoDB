@@ -1,56 +1,49 @@
 import express from "express";
+import conectaNaDatabase from "./config/dbconnect.js"
+import livro from "./models/Livro.js"
+const conexao = await conectaNaDatabase();
 
-const app = express();
-app.use(express.json()); //middleware, que converte as requisições enviadas como String em json para o servidor
-const livros = [
-    {
-        id: 1,
-        Nome: "Código Limpo"
-    },
-    {
-        id: 2,
-        Nome: "O pequeno príncipe"
-    }
-]
-function buscaLivro(id)
-{
-   return livros.findIndex(livro=>
-    {
-        return livro.id === Number(id);
-    });
-}
-
-
-app.get("/", (req, res) =>{
-res.status(200).send("curso de node.js");
+conexao.on("error", (erro) => {
+    console.error("erro de conexão", erro)
 });
 
-app.get("/livros", (req, res) =>
-    {
-        res.status(200).json(livros);
-        
-    });
+conexao.once("open", () => {
+    console.log("conexão feita com sucesso");
+});
+const app = express();
+app.use(express.json()); //middleware, que converte as requisições enviadas como String em json para o servidor
 
-app.post("/livros", (req, res) =>
-    {
-        livros.push(req.body);
-        res.status(201).send("livro enviado");
-    });
 
-app.delete("/livros", (req, res) =>
-    {
-        livros.pop();
-        res.status(200).send("boa, deletou");
-    });
-app.get("/livros/:id", (req, res) =>
-    {
-        const index = buscaLivro(req.params.id);
-        res.status(200).json(livros[index]);
-    });
-app.put("/livros/:id", (req, res) =>
-    {
-        const index = buscaLivro(req.params.id);
-        livros[index].Nome =req.body.Nome;
-        res.status(200).json(livros);
-    });
+
+app.get("/", (req, res) => {
+    res.status(200).send("curso de node.js");
+});
+
+app.get("/livros", async (req, res) => {
+    const listalivros = await livro.find({});
+    res.status(200).json(listalivros);
+
+});
+
+app.post("/livros", (req, res) => {
+    livros.push(req.body);
+    res.status(201).send("livro enviado");
+});
+
+app.get("/livros/:id", (req, res) => {
+    const index = buscaLivro(req.params.id);
+    res.status(200).json(livros[index]);
+});
+app.put("/livros/:id", (req, res) => {
+    const index = buscaLivro(req.params.id);
+    livros[index].Nome = req.body.Nome;
+    res.status(200).json(livros);
+});
+
+app.delete("/livros/:id", (req, res) => {
+    const index = buscaLivro(req.params.id);
+    livros.splice(index, 1);
+    res.status(200).send("deletado com sucesso");
+});
 export default app;
+
