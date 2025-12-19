@@ -1,6 +1,6 @@
 import express from "express";
 import conectaNaDatabase from "./config/dbconnect.js"
-import livro from "./models/Livro.js"
+import routes from "./routes/index.js"
 const conexao = await conectaNaDatabase();
 
 conexao.on("error", (erro) => {
@@ -11,19 +11,10 @@ conexao.once("open", () => {
     console.log("conexão feita com sucesso");
 });
 const app = express();
-app.use(express.json()); //middleware, que converte as requisições enviadas como String em json para o servidor
+routes(app);
 
 
 
-app.get("/", (req, res) => {
-    res.status(200).send("curso de node.js");
-});
-
-app.get("/livros", async (req, res) => {
-    const listalivros = await livro.find({});
-    res.status(200).json(listalivros);
-
-});
 
 app.post("/livros", (req, res) => {
     livros.push(req.body);
