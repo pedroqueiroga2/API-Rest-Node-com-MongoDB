@@ -23,7 +23,7 @@ class LivroController {
         }
         catch(erro)
         {
-            res.status(500).json({ message: `${erro.message} - falha ao cadastrar livro` })
+            res.status(500).json({ message: `${erro.message} - falha ao cadastrar livro` });
         }
         
     }
@@ -38,6 +38,18 @@ class LivroController {
         const id = req.params.id;
         await livro.findByIdAndDelete(id);
         res.status(200).json({message:"livro deletado"});
+    }
+    static async listarLivrosPorEditora(req, res)
+    {
+        const editora = req.query.editora;
+        try{
+            const livrosporEditora = await livro.find({editora: editora}); //"editora:" referencia a propriedade do model e o " editora" a const criada acima do trycatch
+            res.status(200).json(livrosporEditora);
+        }
+        catch(error)
+        {
+             res.status(404).json({ message: `${erro.message} - essa editora não contem nenhum livro em nosso DB` });
+        }
     }
 };
 
