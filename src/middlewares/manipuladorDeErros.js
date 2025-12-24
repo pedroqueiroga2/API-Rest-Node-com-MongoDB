@@ -7,7 +7,7 @@ function manipuladorDeErros(erro, req, res, next) {//middleware de erro
     }
     else if(erro instanceof mongoose.Error.ValidationError)
         {
-            
+            console.log(erro.errors);
             res.status(400).send({message: "Houve um erro de validação de dados"})
         }
     else {
