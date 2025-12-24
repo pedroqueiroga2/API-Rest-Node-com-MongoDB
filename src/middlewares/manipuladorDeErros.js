@@ -1,17 +1,18 @@
-import mongoose from "mongoose"
-
+import mongoose from "mongoose";
+import ErroBase from "../erros/erroBase.js";
+import RequisicaoIncorreta from "../erros/RequisicaoIncorreta.js";
+import ErroValidacao from "../erros/ErroValidacao.js";
 function manipuladorDeErros(erro, req, res, next) {//middleware de erro
 
     if (erro instanceof mongoose.Error.CastError) {
-        res.status(400).send({ message: "um ou mais parâmetros foram informados de forma inválida" });
+        new RequisicaoIncorreta().enviarResposta(res);
     }
     else if(erro instanceof mongoose.Error.ValidationError)
         {
-            const mensagemError = Object.values(erro.errors).map(erro => erro.message).join("; ");
-            res.status(400).send({message: `Os seguintes erros foram encontrados: ${mensagemError}` })
+        new ErroValidacao(erro).enviarResposta(res);
         }
     else {
-        res.status(500).send({ message: "erro interno de servidor." });
+      new ErroBase().enviarResposta(res);
     }
 }
 
