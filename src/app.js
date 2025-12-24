@@ -1,7 +1,7 @@
 import express from 'express';
 import db from './config/dbConnect.js';
 import routes from './routes/index.js';
-import mongoose from "mongoose"
+import manipuladorDeErros from "./middlewares/manipuladorDeErros.js"
 
 db.on('error', console.log.bind(console, 'Erro de conexão'));
 db.once('open', () => {
@@ -11,12 +11,5 @@ db.once('open', () => {
 const app = express();
 app.use(express.json());
 routes(app);
-app.use((erro, req, res, next) => { //middleware de erro
-  if (erro instanceof mongoose.Error.CastError) {
-    res.status(400).send({ message: "um ou mais parâmetros foram informados de forma inválida" });
-  }
-  else {
-    res.status(500).send({ message: "erro interno de servidor." });
-  }
-});
+app.use(manipuladorDeErros);
 export default app;
