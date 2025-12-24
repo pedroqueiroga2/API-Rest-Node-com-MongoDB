@@ -7,8 +7,8 @@ function manipuladorDeErros(erro, req, res, next) {//middleware de erro
     }
     else if(erro instanceof mongoose.Error.ValidationError)
         {
-            console.log(erro.errors);
-            res.status(400).send({message: "Houve um erro de validação de dados"})
+            const mensagemError = Object.values(erro.errors).map(erro => erro.message).join(";");
+            res.status(400).send({message: `Os seguintes erros foram encontrados: ${mensagemError}` })
         }
     else {
         res.status(500).send({ message: "erro interno de servidor." });
