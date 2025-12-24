@@ -7,7 +7,7 @@ function manipuladorDeErros(erro, req, res, next) {//middleware de erro
     }
     else if(erro instanceof mongoose.Error.ValidationError)
         {
-            const mensagemError = Object.values(erro.errors).map(erro => erro.message).join(";");
+            const mensagemError = Object.values(erro.errors).map(erro => erro.message).join("; ");
             res.status(400).send({message: `Os seguintes erros foram encontrados: ${mensagemError}` })
         }
     else {
