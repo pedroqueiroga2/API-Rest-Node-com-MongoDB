@@ -1,5 +1,5 @@
 
-import {autores} from '../models/index.js';
+import { autores } from '../models/index.js';
 import NotFound from '../erros/NotFound.js';
 class AutorController {
 
@@ -12,6 +12,15 @@ class AutorController {
       res.status(200).json(autoresResultado);
 
     } catch (erro) {
+      next(erro);
+    }
+  };
+  static listarAutoresPorFiltro = async (req, res, next) => {
+    try {
+      const nome = req.query.nome;
+      const resultado = await autores.find({nome: nome});
+      res.status(200).send(resultado);
+    } catch(erro) {
       next(erro);
     }
   };
