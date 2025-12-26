@@ -94,10 +94,11 @@ class LivroController {
   static listarLivroPorFiltro = async (req, res, next) => {
     try {
       const {editora, titulo} = req.query;
+      const regex = new RegExp(titulo, 'i'); //usando Regex com JS puro
 
       const busca= {};
       if(editora) busca.editora = editora;
-      if(titulo) busca.titulo = titulo;
+      if(titulo) busca.titulo = regex; //usando Regex com JS puro
       const livrosResultado = await livros.find(busca);
       if (livrosResultado !== null) {
         res.status(200).send(livrosResultado);
