@@ -97,7 +97,7 @@ class LivroController {
       const regex = new RegExp(titulo, 'i'); //usando Regex com JS puro
 
       const busca= {};
-      if(editora) busca.editora = {$regex: editora, $options: "i"};
+      if(editora) busca.editora = {$regex: editora, $options: 'i'}; //usando operadores do MongoDb
       if(titulo) busca.titulo = regex; //usando Regex com JS puro
       const livrosResultado = await livros.find(busca);
       if (livrosResultado !== null) {
