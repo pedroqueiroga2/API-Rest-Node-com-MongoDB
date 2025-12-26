@@ -18,7 +18,7 @@ class AutorController {
   static listarAutoresPorFiltro = async (req, res, next) => {
     try {
       const nome = req.query.nome;
-      const resultado = await autores.find({nome: nome});
+      const resultado = await autores.find({nome: {$regex:nome, $options: 'i'}});
       res.status(200).send(resultado);
     } catch(erro) {
       next(erro);
