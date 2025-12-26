@@ -1,4 +1,4 @@
-import {livros} from '../models/index.js';
+import { autores, livros } from '../models/index.js';
 import NotFound from '../erros/NotFound.js';
 class LivroController {
 
@@ -7,15 +7,14 @@ class LivroController {
       const livrosResultado = await livros.find()
         .populate('autor')
         .exec();
-      if(livrosResultado !==0)
-      {
+      if (livrosResultado !== 0) {
         res.status(200).json(livrosResultado);
       }
-      else{
+      else {
         next(new NotFound('Você não possui livros cadastrados em seu banco'));
       }
 
-      
+
     } catch (erro) {
       next(erro);
     }
@@ -45,7 +44,7 @@ class LivroController {
   static cadastrarLivro = async (req, res, next) => {
     try {
       let livro = new livros(req.body);
-      
+
       const livroResultado = await livro.save();
 
       res.status(201).send(livroResultado.toJSON());
@@ -67,7 +66,7 @@ class LivroController {
         next(new NotFound('Id passado como parâmetro incorreto'));
       }
 
-      
+
     } catch (erro) {
       next(erro);
     }
@@ -93,28 +92,45 @@ class LivroController {
 
   static listarLivroPorFiltro = async (req, res, next) => {
     try {
-      const {editora, titulo} = req.query;
-      const regex = new RegExp(titulo, 'i'); //usando Regex com JS puro
-
-      const busca= {};
-      if(editora) busca.editora = {$regex: editora, $options: 'i'}; //usando operadores do MongoDb
-      if(titulo) busca.titulo = regex; //usando Regex com JS puro
-      const livrosResultado = await livros.find(busca);
-      if (livrosResultado !== null) {
+      const busca = await processaBusca(req.query);
+      if (busca !== null) {
+        const livrosResultado = await livros.find(busca).populate('autor');
         res.status(200).send(livrosResultado);
       }
       else {
-        next(new NotFound('A Editora não existe'));
+        res.status(200).send([]);
       }
-
-
-    } catch (erro) {
+    }
+    catch (erro) {
       next(erro);
     }
   };
 
 
+}
 
+async function processaBusca(parametros) {
+  const { editora, titulo, minPaginas, maxPaginas, nomeAutor } = parametros;
+
+  let busca = {};
+  if (minPaginas || maxPaginas) busca.numeroPaginas = {};
+  if (maxPaginas) busca.numeroPaginas.$lte = maxPaginas;
+  if (minPaginas) busca.numeroPaginas.$gte = minPaginas;
+  if (editora) busca.editora = editora;
+  if (titulo) busca.titulo = { $regex: titulo, $options: 'i' };
+  if (nomeAutor) {
+    const autor = await autores.findOne({ nome: nomeAutor });
+    if (autor !== null) {
+      const autorId = autor._id;
+      busca.autor = autorId;
+    }
+    else {
+      busca = null;
+    }
+
+
+  }
+  return busca;
 }
 
 export default LivroController;
