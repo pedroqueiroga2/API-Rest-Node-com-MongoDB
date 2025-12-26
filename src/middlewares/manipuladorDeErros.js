@@ -12,7 +12,7 @@ function manipuladorDeErros(erro, req, res, next) {//middleware de erro
   else if (erro instanceof mongoose.Error.ValidationError) {
     new ErroValidacao(erro).enviarResposta(res);
   }
-  else if (erro instanceof NotFound) {
+  else if (erro instanceof ErroBase) {
     erro.enviarResposta(res);
   }
   else {
